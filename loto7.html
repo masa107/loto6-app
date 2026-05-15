@@ -1131,15 +1131,30 @@ function getNextRound() {
 
 function downloadCSV(patterns) {
   const nextRound = getNextRound();
+  const A = lastAnalysis;
+  const _now = new Date();
+  const dateStr = `${_now.getFullYear()}年${_now.getMonth() + 1}月${_now.getDate()}日`;
+  const csvEscape = (s) => {
+    const str = String(s);
+    return /[",\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+  };
+  const listOrNone = (arr) => (arr && arr.length) ? arr.join(" ") : "なし";
+
   let csv = "";
-  if (nextRound !== null) {
-    csv += `第${nextRound}回 予想\n`;
-  }
-  csv += "No,パターン名,意図,数字1,数字2,数字3,数字4,数字5,数字6,数字7,ボーナス候補1,ボーナス候補2\n";
+  csv += `ロト7 予想結果\n`;
+  csv += `予想対象,${nextRound !== null ? "第" + nextRound + "回" : "次回"}\n`;
+  csv += `生成日時,${dateStr}\n`;
+  csv += `分析期間,直近${HOT_PERIOD}回（直近${WEIGHT_PERIOD}回を×${WEIGHT_FACTOR}重み付け）\n`;
+  csv += `除外設定,${A && A.excludeUnseen15 ? "直近15回未出現を除外" : "全数字を候補に使用"}\n`;
+  csv += `除外した数字,${csvEscape(listOrNone(A ? A.excludedNumbers : []))}\n`;
+  csv += `軸数字候補,${csvEscape(listOrNone(A ? A.axisCandidates : []))}\n`;
+  csv += `コールドナンバー,${csvEscape(listOrNone(A ? A.coldNumbers : []))}\n`;
+  csv += `\n`;
+  csv += `No,パターン名,本数字（7個）,ボーナス候補（2個）,パターンの意図\n`;
   patterns.forEach((p, idx) => {
-    const intent = `"${p.intent.replace(/"/g, '""')}"`;
-    const name = `"${p.name.replace(/"/g, '""')}"`;
-    csv += `${idx + 1},${name},${intent},${p.numbers.join(",")},${p.bonus[0]},${p.bonus[1]}\n`;
+    const numsStr = p.numbers.join(" - ");
+    const bonusStr = p.bonus.join(" - ");
+    csv += `${idx + 1},${csvEscape(p.name)},${csvEscape(numsStr)},${csvEscape(bonusStr)},${csvEscape(p.intent)}\n`;
   });
   const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
