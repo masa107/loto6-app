@@ -1,0 +1,85 @@
+name: Auto-update LOTO data
+
+on:
+  schedule:
+    # JST 22:00 = UTC 13:00
+    - cron: '0 13 * * 1,4'   # 月・木 22:00 JST → ロト6 自動更新
+    - cron: '0 13 * * 5'     # 金 22:00 JST → ロト7 自動更新
+  workflow_dispatch:
+    inputs:
+      target:
+        description: '更新対象'
+        type: choice
+        options:
+          - both
+          - loto6
+          - loto7
+        default: both
+
+permissions:
+  contents: write
+
+jobs:
+  update-loto6:
+    if: >-
+      github.event.schedule == '0 13 * * 1,4' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (github.event.inputs.target == 'both' ||
+        github.event.inputs.target == 'loto6'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install --quiet requests beautifulsoup4
+
+      - name: Update loto6.html
+        run: python scripts/update_loto.py --kind loto6 --file loto6.html
+
+      - name: Commit & push if changed
+        run: |
+          if [ -n "$(git status --porcelain loto6.html)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add loto6.html
+            git commit -m "chore: ロト6当選番号データを自動更新"
+            git push
+          else
+            echo "変更なし"
+          fi
+
+  update-loto7:
+    if: >-
+      github.event.schedule == '0 13 * * 5' ||
+      (github.event_name == 'workflow_dispatch' &&
+       (github.event.inputs.target == 'both' ||
+        github.event.inputs.target == 'loto7'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install --quiet requests beautifulsoup4
+
+      - name: Update loto7.html
+        run: python scripts/update_loto.py --kind loto7 --file loto7.html
+
+      - name: Commit & push if changed
+        run: |
+          if [ -n "$(git status --porcelain loto7.html)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add loto7.html
+            git commit -m "chore: ロト7当選番号データを自動更新"
+            git push
+          else
+            echo "変更なし"
+          fi
