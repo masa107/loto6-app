@@ -1,0 +1,1268 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ロト7 予想アプリ</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --panel-2: #1c2330;
+    --line: #2b3340;
+    --ink: #e6edf3;
+    --ink-dim: #9aa7b4;
+    --gold: #e3b341;
+    --gold-soft: #f0d08a;
+    --red: #f06b5e;
+    --blue: #4ea3f0;
+    --green: #57c98a;
+    --accent: #e3b341;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+    background:
+      radial-gradient(circle at 15% 10%, rgba(227,179,65,0.10), transparent 40%),
+      radial-gradient(circle at 85% 90%, rgba(78,163,240,0.08), transparent 45%),
+      var(--bg);
+    color: var(--ink);
+    min-height: 100vh;
+    padding: 28px 16px 60px;
+    line-height: 1.6;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; }
+
+  header { text-align: center; margin-bottom: 28px; }
+  header .badge {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 14px;
+    margin-bottom: 12px;
+  }
+  header h1 {
+    font-size: 30px;
+    letter-spacing: 0.04em;
+    background: linear-gradient(120deg, var(--gold-soft), var(--gold));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header .round-title {
+    display: inline-block;
+    margin-top: 12px;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1a1206;
+    background: linear-gradient(120deg, var(--gold-soft), var(--gold));
+    border-radius: 999px;
+    padding: 6px 22px;
+    letter-spacing: 0.06em;
+    box-shadow: 0 4px 14px rgba(227,179,65,0.25);
+  }
+  header p { color: var(--ink-dim); font-size: 13px; margin-top: 10px; }
+
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 18px;
+  }
+  .card h2 {
+    font-size: 15px;
+    color: var(--gold-soft);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card h2::before {
+    content: "";
+    width: 4px; height: 16px;
+    background: var(--gold);
+    border-radius: 2px;
+  }
+
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    align-items: flex-end;
+  }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { font-size: 12px; color: var(--ink-dim); }
+  .field input[type=number] {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    color: var(--ink);
+    border-radius: 8px;
+    padding: 9px 12px;
+    width: 110px;
+    font-size: 15px;
+  }
+  .count-display { font-size: 13px; color: var(--ink-dim); }
+  .count-display b { color: var(--gold); font-size: 16px; }
+
+  button {
+    cursor: pointer;
+    font-family: inherit;
+    border: none;
+    border-radius: 9px;
+    font-size: 14px;
+    transition: transform 0.08s ease, filter 0.15s ease;
+  }
+  button:active { transform: translateY(1px); }
+  .btn-primary {
+    background: linear-gradient(120deg, var(--gold), #c9962b);
+    color: #1a1206;
+    font-weight: 700;
+    padding: 12px 26px;
+    letter-spacing: 0.05em;
+  }
+  .btn-primary:hover { filter: brightness(1.08); }
+  .btn-ghost {
+    background: var(--panel-2);
+    color: var(--ink);
+    border: 1px solid var(--line);
+    padding: 11px 18px;
+  }
+  .btn-ghost:hover { border-color: var(--gold); }
+
+  .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 4px; }
+
+  .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 16px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--ink);
+    user-select: none;
+  }
+  .checkbox-field input[type=checkbox] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    border: 1.5px solid var(--line);
+    border-radius: 5px;
+    background: var(--panel-2);
+    cursor: pointer;
+    position: relative;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .checkbox-field input[type=checkbox]:checked {
+    background: linear-gradient(120deg, var(--gold), #c9962b);
+    border-color: var(--gold);
+  }
+  .checkbox-field input[type=checkbox]:checked::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid #1a1206;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg);
+  }
+  .checkbox-note {
+    font-size: 12px;
+    color: var(--ink-dim);
+    margin-top: 8px;
+    padding-left: 29px;
+    line-height: 1.7;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+  .summary-item {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 14px;
+  }
+  .summary-item .k { font-size: 11px; color: var(--ink-dim); margin-bottom: 6px; }
+  .summary-item .v { font-size: 13px; word-break: break-word; }
+  .chip {
+    display: inline-block;
+    background: rgba(227,179,65,0.12);
+    border: 1px solid rgba(227,179,65,0.35);
+    color: var(--gold-soft);
+    border-radius: 6px;
+    padding: 1px 7px;
+    margin: 2px 3px 2px 0;
+    font-size: 12px;
+  }
+  .chip.cold {
+    background: rgba(78,163,240,0.12);
+    border-color: rgba(78,163,240,0.35);
+    color: #9fd0fa;
+  }
+  .chip.excluded {
+    background: rgba(240,107,94,0.12);
+    border-color: rgba(240,107,94,0.4);
+    color: #f3a89f;
+    text-decoration: line-through;
+  }
+  .chip.none { background: transparent; border-color: var(--line); color: var(--ink-dim); }
+
+  .pattern {
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .pattern-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+    flex-wrap: wrap;
+  }
+  .pattern-no {
+    font-size: 12px;
+    color: #1a1206;
+    background: var(--gold);
+    border-radius: 6px;
+    padding: 1px 8px;
+    font-weight: 700;
+  }
+  .pattern-name { font-size: 15px; font-weight: 700; color: var(--gold-soft); }
+  .pattern-intent { font-size: 12px; color: var(--ink-dim); margin-bottom: 12px; }
+  .balls { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .ball {
+    width: 42px; height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 16px;
+    background: radial-gradient(circle at 32% 28%, #fff, #d9dde3 70%);
+    color: #1a1f29;
+    box-shadow: inset 0 -3px 6px rgba(0,0,0,0.18), 0 2px 4px rgba(0,0,0,0.35);
+  }
+  .ball.b1 { background: radial-gradient(circle at 32% 28%, #fff, #f3c6c0 70%); }
+  .ball.b2 { background: radial-gradient(circle at 32% 28%, #fff, #bcd9f5 70%); }
+  .ball.b3 { background: radial-gradient(circle at 32% 28%, #fff, #c4ecd2 70%); }
+  .ball.b4 { background: radial-gradient(circle at 32% 28%, #fff, #f3dfb3 70%); }
+  .ball.axis { outline: 2px solid var(--gold); outline-offset: 1px; }
+  .ball.cold { outline: 2px solid var(--blue); outline-offset: 1px; }
+  .bonus-sep {
+    color: var(--ink-dim);
+    font-size: 20px;
+    margin: 0 2px;
+  }
+  .ball.bonus {
+    width: 36px; height: 36px;
+    font-size: 14px;
+    background: radial-gradient(circle at 32% 28%, #fff5dc, #e3b341 75%);
+    color: #1a1206;
+  }
+  .legend {
+    display: flex; gap: 16px; flex-wrap: wrap;
+    font-size: 11px; color: var(--ink-dim);
+    margin-top: 14px;
+  }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
+  .dot.axis { background: transparent; outline: 2px solid var(--gold); }
+  .dot.cold { background: transparent; outline: 2px solid var(--blue); }
+  .dot.bonus { background: var(--gold); }
+
+  .empty {
+    text-align: center;
+    color: var(--ink-dim);
+    padding: 40px 10px;
+    font-size: 14px;
+  }
+
+  details.data-editor summary {
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--ink-dim);
+    list-style: none;
+    padding: 4px 0;
+  }
+  details.data-editor summary::-webkit-details-marker { display: none; }
+  details.data-editor summary::before { content: "▸ "; color: var(--gold); }
+  details.data-editor[open] summary::before { content: "▾ "; }
+  .data-note {
+    font-size: 12px;
+    color: var(--ink-dim);
+    margin: 10px 0;
+    padding: 10px 12px;
+    background: var(--panel-2);
+    border-left: 2px solid var(--gold);
+    border-radius: 4px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 240px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink);
+    padding: 12px;
+    font-family: "SF Mono", Consolas, monospace;
+    font-size: 12px;
+    line-height: 1.7;
+    resize: vertical;
+  }
+  .data-status { font-size: 12px; margin-top: 8px; }
+  .data-status.ok { color: var(--green); }
+  .data-status.err { color: var(--red); }
+
+  footer {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-dim);
+    margin-top: 24px;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 600px) {
+    body { padding: 16px 10px 44px; }
+
+    header { margin-bottom: 20px; }
+    header .badge { font-size: 10px; letter-spacing: 0.18em; padding: 3px 10px; }
+    header h1 { font-size: 23px; }
+    header .round-title { font-size: 16px; padding: 5px 16px; margin-top: 10px; }
+    header p { font-size: 12px; }
+
+    .card { padding: 15px 13px; margin-bottom: 13px; border-radius: 12px; }
+    .card h2 { font-size: 14px; margin-bottom: 12px; }
+
+    .controls { gap: 12px; }
+    .field { width: 100%; }
+    .field input[type=number] { width: 100%; font-size: 16px; padding: 11px 12px; }
+    .count-display { width: 100%; }
+    #generateBtn { width: 100%; padding: 14px; font-size: 15px; }
+    .actions { gap: 8px; }
+    .actions button { flex: 1; min-width: 0; padding: 12px 8px; font-size: 13px; }
+
+    .summary-grid { grid-template-columns: 1fr; gap: 10px; }
+    .summary-item { padding: 11px 12px; }
+
+    .pattern { padding: 13px; }
+    .pattern-name { font-size: 14px; }
+    .balls { gap: 6px; }
+    .ball { width: 38px; height: 38px; font-size: 15px; }
+    .ball.bonus { width: 32px; height: 32px; font-size: 13px; }
+    .bonus-sep { font-size: 17px; }
+
+    .legend { gap: 10px 14px; font-size: 10px; }
+
+    textarea { min-height: 200px; font-size: 12px; }
+    .data-note { font-size: 11px; }
+
+    footer { font-size: 10px; }
+  }
+
+  @media (max-width: 360px) {
+    .ball { width: 34px; height: 34px; font-size: 14px; }
+    .ball.bonus { width: 30px; height: 30px; font-size: 12px; }
+    .balls { gap: 5px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span class="badge">L O T O　7　P R E D I C T O R</span>
+    <h1>ロト7 予想アプリ</h1>
+    <div class="round-title" id="roundTitle">第677回 予想</div>
+    <p id="roundSub">直近25回（第652〜676回）の出現傾向を分析しています</p>
+  </header>
+
+  <!-- コントロール -->
+  <div class="card">
+    <h2>予想を生成</h2>
+    <div class="controls">
+      <div class="field">
+        <label for="count">口数（1〜20）</label>
+        <input type="number" id="count" min="1" max="20" value="5">
+      </div>
+      <div class="count-display">
+        生成数: <b id="countEcho">5</b> 口
+      </div>
+      <button class="btn-primary" id="generateBtn">予想する</button>
+    </div>
+    <label class="checkbox-field" for="excludeToggle">
+      <input type="checkbox" id="excludeToggle" checked>
+      <span>直近15回で出ていない数字を除外する</span>
+    </label>
+    <div class="checkbox-note" id="excludeNote">
+      ON：直近15回で1度も出ていない数字を全パターンから除外します。<br>
+      OFF：除外せず、コールドナンバーを混ぜた「スパイスパターン」も生成します。
+    </div>
+    <div class="actions">
+      <button class="btn-ghost" id="csvBtn">CSVダウンロード</button>
+      <button class="btn-ghost" id="rerollBtn">別の組み合わせで再生成</button>
+    </div>
+  </div>
+
+  <!-- 分析サマリー -->
+  <div class="card" id="summaryCard" style="display:none;">
+    <h2>分析サマリー</h2>
+    <div class="summary-grid" id="summaryGrid"></div>
+  </div>
+
+  <!-- 結果 -->
+  <div class="card">
+    <h2>予想結果</h2>
+    <div id="results">
+      <div class="empty">「予想する」ボタンを押すと、ここに結果が表示されます。</div>
+    </div>
+    <div class="legend" id="legend" style="display:none;">
+      <span><span class="dot axis"></span> 軸数字（直近15回で3回以上出現）</span>
+      <span><span class="dot bonus"></span> ボーナス候補</span>
+      <span style="color:var(--ink-dim);">※ 直近15回で未出現の数字は予想から除外しています</span>
+    </div>
+  </div>
+
+  <!-- データ編集 -->
+  <div class="card">
+    <details class="data-editor">
+      <summary>当選番号データを編集する（最新化したいとき）</summary>
+      <div class="data-note">
+        現在、<b>第652回〜第676回（2025年11月14日〜2026年5月8日）の実際の当選番号</b>が
+        埋め込まれています。<br>
+        新しい抽選があったら、ここで最新化できます。1行 = 1回分で、
+        「新しい回 → 古い回」の順に並べてください。<br>
+        形式は <code>第677回 2026-05-15 2,6,15,19,20,22,27 31 33</code> のように、
+        <b>回号・日付（任意）＋ 本数字7個（カンマ区切り）＋ ボーナス2個（スペース区切り）</b> です。<br>
+        回号と日付は省略しても構いません（例: <code>2,6,15,19,20,22,27 31 33</code>）。<br>
+        みずほ銀行公式サイトの当選番号を見て書き換え、「データを反映」を押してください。
+      </div>
+      <textarea id="dataArea" spellcheck="false"></textarea>
+      <div class="actions">
+        <button class="btn-ghost" id="applyDataBtn">データを反映</button>
+        <button class="btn-ghost" id="resetDataBtn">埋め込みデータに戻す</button>
+      </div>
+      <div class="data-status" id="dataStatus"></div>
+    </details>
+  </div>
+
+  <footer>
+    本アプリは過去の出現傾向を分析するもので、当選を保証するものではありません。<br>
+    宝くじはランダム抽選です。参考程度にお楽しみください。
+  </footer>
+
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   定数
+============================================================ */
+const LOTO7_MIN = 1;
+const LOTO7_MAX = 37;
+const PICK_COUNT = 7;
+const BONUS_COUNT = 2;
+const HOT_PERIOD = 25;
+const WEIGHT_PERIOD = 15;
+const WEIGHT_FACTOR = 1.5;
+const COLD_PERIOD = 20;
+
+const BLOCK_RANGES = {
+  "1-9":   range(1, 9),
+  "10-19": range(10, 19),
+  "20-29": range(20, 29),
+  "30-37": range(30, 37),
+};
+const BLOCK_LABELS = {
+  "1-9": "小さい数字", "10-19": "10番台", "20-29": "20番台", "30-37": "大きい数字",
+};
+
+function range(a, b) {
+  const r = [];
+  for (let i = a; i <= b; i++) r.push(i);
+  return r;
+}
+
+/* ============================================================
+   埋め込みデータ（直近25回分・新しい順）
+   出典: みずほ銀行公式発表のロト7当選番号
+   第676回(2026/5/8) 〜 第652回(2025/11/14)
+   形式: {round:回号, date:"抽選日", numbers:[本数字7個], bonus:[ボーナス2個]}
+   ※新しい抽選があったら、画面下の「当選番号データを編集する」から
+     更新できます。
+============================================================ */
+const EMBEDDED_DATA = [
+  { round: 676, date: "2026-05-08", numbers: [2, 6, 15, 19, 20, 22, 27], bonus: [31, 33] },
+  { round: 675, date: "2026-05-01", numbers: [5, 8, 16, 18, 24, 28, 31], bonus: [6, 23] },
+  { round: 674, date: "2026-04-24", numbers: [1, 6, 7, 9, 12, 22, 26], bonus: [8, 14] },
+  { round: 673, date: "2026-04-17", numbers: [6, 9, 10, 12, 16, 24, 32], bonus: [17, 19] },
+  { round: 672, date: "2026-04-10", numbers: [7, 11, 15, 16, 17, 24, 33], bonus: [6, 9] },
+  { round: 671, date: "2026-04-03", numbers: [7, 13, 16, 22, 28, 33, 36], bonus: [2, 25] },
+  { round: 670, date: "2026-03-27", numbers: [3, 4, 9, 10, 18, 21, 37], bonus: [15, 23] },
+  { round: 669, date: "2026-03-20", numbers: [3, 5, 6, 7, 9, 13, 16], bonus: [11, 23] },
+  { round: 668, date: "2026-03-13", numbers: [1, 8, 11, 14, 18, 22, 29], bonus: [19, 35] },
+  { round: 667, date: "2026-03-06", numbers: [9, 13, 20, 22, 28, 29, 33], bonus: [21, 23] },
+  { round: 666, date: "2026-02-27", numbers: [2, 17, 18, 22, 23, 25, 33], bonus: [16, 34] },
+  { round: 665, date: "2026-02-20", numbers: [6, 8, 14, 19, 22, 25, 35], bonus: [12, 17] },
+  { round: 664, date: "2026-02-13", numbers: [3, 6, 8, 14, 21, 22, 31], bonus: [17, 37] },
+  { round: 663, date: "2026-02-06", numbers: [4, 6, 10, 11, 13, 17, 23], bonus: [25, 32] },
+  { round: 662, date: "2026-01-30", numbers: [4, 14, 15, 21, 22, 24, 37], bonus: [5, 20] },
+  { round: 661, date: "2026-01-23", numbers: [7, 12, 17, 22, 31, 34, 35], bonus: [20, 32] },
+  { round: 660, date: "2026-01-16", numbers: [4, 6, 12, 13, 16, 17, 31], bonus: [14, 20] },
+  { round: 659, date: "2026-01-09", numbers: [2, 8, 9, 14, 27, 34, 36], bonus: [5, 18] },
+  { round: 658, date: "2025-12-26", numbers: [10, 12, 16, 18, 19, 22, 37], bonus: [11, 20] },
+  { round: 657, date: "2025-12-19", numbers: [9, 11, 16, 23, 27, 29, 32], bonus: [6, 24] },
+  { round: 656, date: "2025-12-12", numbers: [1, 4, 6, 20, 30, 34, 37], bonus: [14, 25] },
+  { round: 655, date: "2025-12-05", numbers: [4, 5, 12, 13, 24, 26, 33], bonus: [3, 14] },
+  { round: 654, date: "2025-11-28", numbers: [3, 12, 25, 29, 30, 32, 33], bonus: [28, 31] },
+  { round: 653, date: "2025-11-21", numbers: [6, 7, 12, 25, 26, 30, 33], bonus: [13, 15] },
+  { round: 652, date: "2025-11-14", numbers: [1, 16, 21, 26, 27, 30, 35], bonus: [6, 37] },
+];
+
+function buildSampleData() {
+  return EMBEDDED_DATA.map(d => ({
+    round: d.round,
+    date: d.date,
+    numbers: [...d.numbers],
+    bonus: [...d.bonus],
+  }));
+}
+
+let currentData = buildSampleData();
+let lastPatterns = [];
+let lastAnalysis = null;
+
+/* ============================================================
+   データのテキスト変換
+   形式: 「第676回 2026-05-08 2,6,15,19,20,22,27 31 33」
+   （回号・日付は任意。本数字7個 と ボーナス2個 は必須）
+============================================================ */
+function dataToText(data) {
+  return data.map(d => {
+    const head = (d.round ? `第${d.round}回 ` : "") + (d.date ? `${d.date} ` : "");
+    return `${head}${d.numbers.join(",")} ${d.bonus[0]} ${d.bonus[1]}`;
+  }).join("\n");
+}
+
+function textToData(text) {
+  const lines = text.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+  if (lines.length < 1) throw new Error("データが空です。");
+  const data = [];
+  lines.forEach((line, idx) => {
+    const tokens = line.split(/\s+/);
+    // 末尾3トークンが「本数字群」「ボーナス1」「ボーナス2」
+    if (tokens.length < 3) {
+      throw new Error(`${idx + 1}行目: 「本数字 スペース ボーナス1 スペース ボーナス2」の形式にしてください。`);
+    }
+    const bonus2Str = tokens[tokens.length - 1];
+    const bonus1Str = tokens[tokens.length - 2];
+    const numsStr = tokens[tokens.length - 3];
+    const nums = numsStr.split(",").map(s => parseInt(s, 10));
+    const bonus1 = parseInt(bonus1Str, 10);
+    const bonus2 = parseInt(bonus2Str, 10);
+
+    let round = null, date = "";
+    const rm = line.match(/第\s*(\d+)\s*回/);
+    if (rm) round = parseInt(rm[1], 10);
+    const dm = line.match(/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if (dm) date = `${dm[1]}-${String(+dm[2]).padStart(2,"0")}-${String(+dm[3]).padStart(2,"0")}`;
+
+    if (nums.length !== PICK_COUNT || nums.some(isNaN)) {
+      throw new Error(`${idx + 1}行目: 本数字は7個必要です（カンマ区切り）。`);
+    }
+    if (isNaN(bonus1) || isNaN(bonus2)) {
+      throw new Error(`${idx + 1}行目: ボーナス数字が読み取れません（スペース区切りで2個必要）。`);
+    }
+    const all = [...nums, bonus1, bonus2];
+    if (all.some(n => n < LOTO7_MIN || n > LOTO7_MAX)) {
+      throw new Error(`${idx + 1}行目: 数字は1〜37の範囲にしてください。`);
+    }
+    if (new Set(nums).size !== PICK_COUNT) {
+      throw new Error(`${idx + 1}行目: 本数字に重複があります。`);
+    }
+    if (bonus1 === bonus2) {
+      throw new Error(`${idx + 1}行目: ボーナス数字2個が同じです。`);
+    }
+    if (nums.includes(bonus1) || nums.includes(bonus2)) {
+      throw new Error(`${idx + 1}行目: ボーナスが本数字と重複しています。`);
+    }
+    data.push({
+      round: round,
+      date: date,
+      numbers: [...nums].sort((a, b) => a - b),
+      bonus: [bonus1, bonus2].sort((a, b) => a - b),
+    });
+  });
+  if (data.length < 5) {
+    throw new Error("最低5回分のデータが必要です（25回分推奨）。");
+  }
+  return data;
+}
+
+/* ============================================================
+   分析ロジック
+============================================================ */
+function analyze(data, excludeUnseen15) {
+  if (typeof excludeUnseen15 === "undefined") excludeUnseen15 = true;
+
+  const recent25 = data.slice(0, HOT_PERIOD);
+  const recent15 = data.slice(0, WEIGHT_PERIOD);
+
+  const weighted = {};
+  const raw15 = {};
+  for (let n = LOTO7_MIN; n <= LOTO7_MAX; n++) { weighted[n] = 0; raw15[n] = 0; }
+
+  // 直近25回：1.0倍
+  recent25.forEach(e => e.numbers.forEach(n => { weighted[n] += 1.0; }));
+  // 直近15回：追加0.5倍 → 合計1.5倍の重み
+  recent15.forEach(e => e.numbers.forEach(n => {
+    weighted[n] += 0.5;
+    raw15[n] += 1;
+  }));
+
+  const hotNumbers = range(LOTO7_MIN, LOTO7_MAX)
+    .filter(n => weighted[n] > 0)
+    .sort((a, b) => weighted[b] - weighted[a]);
+
+  const axisCandidates = range(LOTO7_MIN, LOTO7_MAX)
+    .filter(n => raw15[n] >= 3)
+    .sort((a, b) => (raw15[b] - raw15[a]) || (weighted[b] - weighted[a]));
+
+  const coldWindow = data.slice(0, Math.min(COLD_PERIOD, data.length));
+  const appeared = new Set();
+  coldWindow.forEach(e => e.numbers.forEach(n => appeared.add(n)));
+  const coldNumbers = range(LOTO7_MIN, LOTO7_MAX).filter(n => !appeared.has(n));
+
+  const unseen15 = range(LOTO7_MIN, LOTO7_MAX).filter(n => raw15[n] === 0);
+
+  let excludedNumbers, allowedNumbers;
+  if (excludeUnseen15) {
+    excludedNumbers = unseen15.slice();
+    allowedNumbers = range(LOTO7_MIN, LOTO7_MAX).filter(n => raw15[n] >= 1);
+  } else {
+    excludedNumbers = [];
+    allowedNumbers = range(LOTO7_MIN, LOTO7_MAX);
+  }
+
+  const blockCounter = {};
+  Object.keys(BLOCK_RANGES).forEach(b => blockCounter[b] = 0);
+  recent15.forEach(e => e.numbers.forEach(n => {
+    blockCounter[blockOf(n)]++;
+  }));
+
+  return {
+    weighted, raw15, hotNumbers, axisCandidates, coldNumbers,
+    unseen15, excludeUnseen15, excludedNumbers, allowedNumbers, blockCounter,
+  };
+}
+
+function blockOf(n) {
+  if (n <= 9) return "1-9";
+  if (n <= 19) return "10-19";
+  if (n <= 29) return "20-29";
+  return "30-37";
+}
+
+/* ============================================================
+   重み付き抽選ユーティリティ
+============================================================ */
+function weightedPick(candidates, weightOf, k, exclude) {
+  exclude = exclude || new Set();
+  let pool = candidates.filter(c => !exclude.has(c));
+  const picked = [];
+  while (picked.length < k && pool.length > 0) {
+    const weights = pool.map(c => Math.max(weightOf(c), 0.1));
+    const total = weights.reduce((a, b) => a + b, 0);
+    let r = Math.random() * total;
+    let chosen = pool[0];
+    for (let i = 0; i < pool.length; i++) {
+      r -= weights[i];
+      if (r <= 0) { chosen = pool[i]; break; }
+    }
+    picked.push(chosen);
+    pool = pool.filter(c => c !== chosen);
+  }
+  return picked;
+}
+
+/* ============================================================
+   各ブロックに最低1個ずつ分散させる
+============================================================ */
+function balanceBlocks(numbers, weighted, allowed) {
+  const allowedSet = allowed instanceof Set ? allowed
+    : new Set(allowed || range(LOTO7_MIN, LOTO7_MAX));
+  let nums = Array.from(new Set(numbers)).filter(n => allowedSet.has(n));
+  const present = {};
+  Object.keys(BLOCK_RANGES).forEach(b => {
+    present[b] = nums.filter(n => BLOCK_RANGES[b].includes(n));
+  });
+  const missing = Object.keys(present).filter(b => present[b].length === 0);
+
+  missing.forEach(b => {
+    const donors = Object.keys(present).sort((x, y) => present[y].length - present[x].length);
+    for (const donor of donors) {
+      if (present[donor].length >= 2) {
+        const drop = present[donor][present[donor].length - 1];
+        nums = nums.filter(n => n !== drop);
+        present[donor] = present[donor].filter(n => n !== drop);
+        const cands = BLOCK_RANGES[b]
+          .filter(n => !nums.includes(n) && allowedSet.has(n))
+          .sort((x, y) => weighted[y] - weighted[x]);
+        if (cands.length === 0) continue;
+        const top = cands.slice(0, Math.min(3, cands.length));
+        const pick = top[Math.floor(Math.random() * top.length)];
+        nums.push(pick);
+        present[b].push(pick);
+        break;
+      }
+    }
+  });
+
+  while (nums.length > PICK_COUNT) nums.pop();
+  while (nums.length < PICK_COUNT) {
+    const cands = [...allowedSet]
+      .filter(n => !nums.includes(n))
+      .sort((x, y) => weighted[y] - weighted[x]);
+    if (cands.length === 0) break;
+    nums.push(cands[0]);
+  }
+  return nums.sort((a, b) => a - b);
+}
+
+/* ============================================================
+   軸数字を1〜2個組み込む
+============================================================ */
+function ensureAxis(numbers, axisCandidates, weighted, minAxis, maxAxis, allowed) {
+  const allowedSet = allowed instanceof Set ? allowed
+    : new Set(allowed || range(LOTO7_MIN, LOTO7_MAX));
+  let nums = [...numbers];
+  const axisSet = new Set(axisCandidates);
+  let inAxis = nums.filter(n => axisSet.has(n));
+
+  if (inAxis.length >= minAxis) {
+    if (inAxis.length > maxAxis) {
+      const removable = inAxis.slice(maxAxis);
+      removable.forEach(r => {
+        nums = nums.filter(n => n !== r);
+        const cands = [...allowedSet]
+          .filter(n => !nums.includes(n) && !axisSet.has(n))
+          .sort((x, y) => weighted[y] - weighted[x]);
+        if (cands.length) nums.push(cands[0]);
+      });
+    }
+    return nums.sort((a, b) => a - b);
+  }
+
+  let need = minAxis - inAxis.length;
+  let availAxis = axisCandidates.filter(a => !nums.includes(a));
+  while (need > 0 && availAxis.length > 0) {
+    const pick = availAxis[0];
+    const nonAxis = nums.filter(n => !axisSet.has(n))
+      .sort((x, y) => weighted[x] - weighted[y]);
+    if (nonAxis.length) {
+      nums = nums.filter(n => n !== nonAxis[0]);
+    } else {
+      nums.pop();
+    }
+    nums.push(pick);
+    availAxis = availAxis.filter(a => a !== pick);
+    need--;
+  }
+  return nums.sort((a, b) => a - b);
+}
+
+/* ============================================================
+   パターン別の数字生成
+============================================================ */
+function genHotFocus(A) {
+  const hot = A.hotNumbers.filter(n => A.allowedNumbers.includes(n)).slice(0, 16);
+  let nums = weightedPick(hot, n => A.weighted[n] + 0.1, PICK_COUNT);
+  return ensureAxis(nums, A.axisCandidates, A.weighted, 1, 2, A.allowedNumbers);
+}
+
+function genBalanced(A) {
+  let nums = [];
+  const allowedSet = new Set(A.allowedNumbers);
+  const blockKeys = Object.keys(BLOCK_RANGES); // 4ブロック
+  // シャッフル
+  for (let i = blockKeys.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [blockKeys[i], blockKeys[j]] = [blockKeys[j], blockKeys[i]];
+  }
+  // 7個を4ブロックに分配: 7 = 4*1 + 3 余り → 3ブロックが2個ずつ、1ブロックが1個
+  const extraBlocks = new Set(blockKeys.slice(0, 3));
+  blockKeys.forEach(b => {
+    const k = extraBlocks.has(b) ? 2 : 1;
+    const blockPool = BLOCK_RANGES[b].filter(n => allowedSet.has(n));
+    const picks = weightedPick(blockPool, n => A.weighted[n] + 0.1, k, new Set(nums));
+    nums = nums.concat(picks);
+  });
+  return ensureAxis(nums, A.axisCandidates, A.weighted, 1, 2, A.allowedNumbers);
+}
+
+function genAxisHot(A) {
+  let nums = [];
+  const axis = A.axisCandidates;
+  if (axis.length > 0) {
+    nums.push(axis[0]);
+    if (axis.length >= 2 && Math.random() < 0.7) nums.push(axis[1]);
+  }
+  const remaining = PICK_COUNT - nums.length;
+  const axisSet = new Set(axis);
+  let pool = A.hotNumbers
+    .filter(n => !axisSet.has(n) && A.allowedNumbers.includes(n))
+    .slice(0, 16);
+  if (pool.length === 0) {
+    pool = A.allowedNumbers.filter(n => !nums.includes(n));
+  }
+  const picks = weightedPick(pool, n => A.weighted[n] + 0.1, remaining, new Set(nums));
+  return nums.concat(picks);
+}
+
+function genQuasiHot(A) {
+  let quasi = A.allowedNumbers
+    .filter(n => A.raw15[n] >= 1 && A.raw15[n] <= 2)
+    .sort((a, b) => A.weighted[b] - A.weighted[a]);
+  let nums = [];
+  if (quasi.length >= 2) {
+    const k = quasi.length >= 3 && Math.random() < 0.6 ? 3 : 2;
+    nums = weightedPick(quasi, n => A.weighted[n] + 0.1, k);
+  }
+  const remaining = PICK_COUNT - nums.length;
+  const hot = A.hotNumbers
+    .filter(n => A.allowedNumbers.includes(n) && !nums.includes(n))
+    .slice(0, 16);
+  nums = nums.concat(
+    weightedPick(hot, n => A.weighted[n] + 0.1, remaining, new Set(nums))
+  );
+  return ensureAxis(nums, A.axisCandidates, A.weighted, 1, 2, A.allowedNumbers);
+}
+
+function genSkewed(A) {
+  const allowedSet = new Set(A.allowedNumbers);
+  const sorted = Object.keys(A.blockCounter).sort((a, b) => A.blockCounter[b] - A.blockCounter[a]);
+  const topBlock = sorted[0];
+  const secondBlock = sorted[1] || topBlock;
+  let nums = [];
+  // トップブロックから3個
+  const topPool = BLOCK_RANGES[topBlock].filter(n => allowedSet.has(n));
+  nums = nums.concat(weightedPick(topPool, n => A.weighted[n] + 0.1, 3));
+  // 2番手ブロックから2個
+  const secondPool = BLOCK_RANGES[secondBlock].filter(n => allowedSet.has(n));
+  nums = nums.concat(weightedPick(secondPool, n => A.weighted[n] + 0.1, 2, new Set(nums)));
+  // 残り2個は全体から
+  const remaining = PICK_COUNT - nums.length;
+  if (remaining > 0) {
+    const other = A.allowedNumbers.filter(n => !nums.includes(n));
+    nums = nums.concat(weightedPick(other, n => A.weighted[n] + 0.1, remaining));
+  }
+  return ensureAxis(nums, A.axisCandidates, A.weighted, 1, 2, A.allowedNumbers);
+}
+
+function genSpice(A) {
+  let spice;
+  if (A.coldNumbers.length > 0) {
+    spice = A.coldNumbers[Math.floor(Math.random() * A.coldNumbers.length)];
+  } else {
+    spice = A.allowedNumbers.slice().sort((a, b) => A.weighted[a] - A.weighted[b])[0];
+  }
+  const hot = A.hotNumbers
+    .filter(n => n !== spice && A.allowedNumbers.includes(n))
+    .slice(0, 16);
+  const rest = weightedPick(hot, n => A.weighted[n] + 0.1, PICK_COUNT - 1, new Set([spice]));
+  let nums = [spice].concat(rest);
+  nums = ensureAxis(nums, A.axisCandidates, A.weighted, 1, 2, A.allowedNumbers);
+  if (!nums.includes(spice)) nums[nums.length - 1] = spice;
+  return nums;
+}
+
+/* ============================================================
+   パターン生成（重複チェック込み）
+============================================================ */
+function makePattern(name, intent, rawNumbers, A) {
+  let numbers = balanceBlocks(rawNumbers, A.weighted, A.allowedNumbers);
+  if (new Set(numbers).size !== PICK_COUNT) {
+    throw new Error("内部エラー: 本数字に重複が発生しました。");
+  }
+  if (numbers.some(n => n < LOTO7_MIN || n > LOTO7_MAX)) {
+    throw new Error("内部エラー: 範囲外の数字が発生しました。");
+  }
+  if (numbers.some(n => A.excludedNumbers.includes(n))) {
+    throw new Error("内部エラー: 除外対象の数字が混入しました。");
+  }
+  const bonus = pickBonus(numbers, A);
+  return { name, intent, numbers, bonus };
+}
+
+function pickBonus(numbers, A) {
+  const numSet = new Set(numbers);
+  const cands = A.allowedNumbers
+    .filter(n => !numSet.has(n))
+    .sort((a, b) => A.weighted[b] - A.weighted[a]);
+
+  let pool;
+  if (cands.length >= 2) {
+    pool = cands.slice(0, Math.min(10, cands.length));
+  } else {
+    pool = range(LOTO7_MIN, LOTO7_MAX).filter(n => !numSet.has(n));
+  }
+
+  if (pool.length < 2) {
+    const fallback = range(LOTO7_MIN, LOTO7_MAX).filter(n => !numSet.has(n));
+    const b1 = fallback[0];
+    const b2 = fallback[1] || (b1 === LOTO7_MAX ? LOTO7_MAX - 1 : b1 + 1);
+    return [b1, b2].sort((a, b) => a - b);
+  }
+
+  const b1 = pool[Math.floor(Math.random() * pool.length)];
+  const rest = pool.filter(n => n !== b1);
+  const b2 = rest[Math.floor(Math.random() * rest.length)];
+  return [b1, b2].sort((a, b) => a - b);
+}
+
+function generatePatterns(A, count) {
+  const patterns = [];
+  const excludeOn = A.excludeUnseen15;
+
+  patterns.push(makePattern("ホット重視",
+    "直近25回の重み付き出現上位を中心に構成", genHotFocus(A), A));
+  patterns.push(makePattern("バランス型",
+    "全ブロックに均等分散したオーソドックスな構成", genBalanced(A), A));
+  patterns.push(makePattern("軸+ホット",
+    "直近15回で3回以上出た軸数字をコアに、ホット数字を加える", genAxisHot(A), A));
+
+  if (excludeOn) {
+    patterns.push(makePattern("準ホット",
+      "直近15回で出現が少なめ（1〜2回）の数字に軽く寄せた構成", genQuasiHot(A), A));
+  } else {
+    patterns.push(makePattern("スパイス",
+      "コールドナンバー（直近20回未出現）を1つ混ぜた逆張り構成", genSpice(A), A));
+  }
+
+  patterns.push(makePattern("偏りパターン",
+    "最近の出現傾向（" + dominantBlockLabel(A.blockCounter) + "が多い）を反映", genSkewed(A), A));
+
+  const fourthType = excludeOn
+    ? ["準ホット(別解)", "出現が少なめの数字を拾った別の組み合わせ", genQuasiHot]
+    : ["スパイス(別解)", "別のコールドナンバーを混ぜた逆張りの別解", genSpice];
+  const extraTypes = [
+    ["バランス型(変則)", "全ブロック分散をベースにランダム性を加味", genBalanced],
+    ["軸+ホット(別解)", "軸数字とホット数字の別の組み合わせ", genAxisHot],
+    ["ホット重視(別解)", "ホット上位数字の別の組み合わせ", genHotFocus],
+    fourthType,
+  ];
+  let i = 0;
+  while (patterns.length < count) {
+    const [name, intent, fn] = extraTypes[i % extraTypes.length];
+    patterns.push(makePattern(name, intent, fn(A), A));
+    i++;
+  }
+
+  // 同一の7個セットがあれば作り直し
+  const seen = new Set();
+  patterns.forEach(p => {
+    let key = p.numbers.join(",");
+    let attempts = 0;
+    while (seen.has(key) && attempts < 12) {
+      const fresh = balanceBlocks(genBalanced(A), A.weighted, A.allowedNumbers);
+      p.numbers = fresh;
+      p.bonus = pickBonus(fresh, A);
+      key = p.numbers.join(",");
+      attempts++;
+    }
+    seen.add(key);
+  });
+
+  return patterns.slice(0, count);
+}
+
+function dominantBlockLabel(blockCounter) {
+  let top = null, max = -1;
+  Object.keys(blockCounter).forEach(b => {
+    if (blockCounter[b] > max) { max = blockCounter[b]; top = b; }
+  });
+  return BLOCK_LABELS[top] || top;
+}
+
+/* ============================================================
+   描画
+============================================================ */
+function renderSummary(A) {
+  const card = document.getElementById("summaryCard");
+  const grid = document.getElementById("summaryGrid");
+  card.style.display = "";
+
+  const axisHtml = A.axisCandidates.length
+    ? A.axisCandidates.map(n => `<span class="chip">${n}</span>`).join("")
+    : `<span class="chip none">なし</span>`;
+  const coldHtml = A.coldNumbers.length
+    ? A.coldNumbers.map(n => `<span class="chip cold">${n}</span>`).join("")
+    : `<span class="chip none">なし</span>`;
+  const hotTop = A.hotNumbers.slice(0, 8)
+    .map(n => `<span class="chip">${n}</span>`).join("");
+  const blockHtml = Object.keys(A.blockCounter)
+    .map(b => `${b}:${A.blockCounter[b]}`).join(" / ");
+
+  let excludeRow;
+  if (A.excludeUnseen15) {
+    const excludedHtml = A.excludedNumbers.length
+      ? A.excludedNumbers.map(n => `<span class="chip excluded">${n}</span>`).join("")
+      : `<span class="chip none">なし（全数字が直近15回に出現）</span>`;
+    excludeRow = `
+      <div class="summary-item" style="grid-column: 1 / -1;">
+        <div class="k">⚠ 候補から除外した数字（直近${WEIGHT_PERIOD}回で未出現）</div>
+        <div class="v">${excludedHtml}</div>
+      </div>`;
+  } else {
+    const wouldExcludeHtml = A.unseen15.length
+      ? A.unseen15.map(n => `<span class="chip none">${n}</span>`).join("")
+      : `<span class="chip none">なし</span>`;
+    excludeRow = `
+      <div class="summary-item" style="grid-column: 1 / -1;">
+        <div class="k">除外設定：OFF（全数字を候補に使用中）</div>
+        <div class="v" style="font-size:12px;color:var(--ink-dim);">
+          ※ 直近${WEIGHT_PERIOD}回で未出現の数字（${wouldExcludeHtml}）も候補に含めています
+        </div>
+      </div>`;
+  }
+
+  grid.innerHTML = `
+    <div class="summary-item">
+      <div class="k">母集団 / 重み</div>
+      <div class="v">直近${HOT_PERIOD}回 ／ 直近${WEIGHT_PERIOD}回を×${WEIGHT_FACTOR}</div>
+    </div>
+    <div class="summary-item">
+      <div class="k">ホットナンバー上位8</div>
+      <div class="v">${hotTop}</div>
+    </div>
+    <div class="summary-item">
+      <div class="k">軸数字候補（15回で3回以上）</div>
+      <div class="v">${axisHtml}</div>
+    </div>
+    <div class="summary-item">
+      <div class="k">コールドナンバー（20回未出現・参考）</div>
+      <div class="v">${coldHtml}</div>
+    </div>
+    ${excludeRow}
+    <div class="summary-item" style="grid-column: 1 / -1;">
+      <div class="k">ブロック別出現（直近${WEIGHT_PERIOD}回）</div>
+      <div class="v">${blockHtml}</div>
+    </div>
+  `;
+}
+
+function renderResults(patterns, A) {
+  const box = document.getElementById("results");
+  const axisSet = new Set(A.axisCandidates);
+  const coldSet = A.excludeUnseen15 ? new Set() : new Set(A.coldNumbers);
+
+  box.innerHTML = patterns.map((p, idx) => {
+    const balls = p.numbers.map(n => {
+      let cls = "ball b" + (blockIndex(n) + 1);
+      if (axisSet.has(n)) cls += " axis";
+      else if (coldSet.has(n)) cls += " cold";
+      return `<div class="${cls}">${n}</div>`;
+    }).join("");
+    const bonusBalls = p.bonus.map(b =>
+      `<div class="ball bonus" title="ボーナス候補">${b}</div>`
+    ).join("");
+    return `
+      <div class="pattern">
+        <div class="pattern-head">
+          <span class="pattern-no">${idx + 1}</span>
+          <span class="pattern-name">${p.name}</span>
+        </div>
+        <div class="pattern-intent">${p.intent}</div>
+        <div class="balls">
+          ${balls}
+          <span class="bonus-sep">＋</span>
+          ${bonusBalls}
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  const legend = document.getElementById("legend");
+  if (A.excludeUnseen15) {
+    legend.innerHTML = `
+      <span><span class="dot axis"></span> 軸数字（直近15回で3回以上出現）</span>
+      <span><span class="dot bonus"></span> ボーナス候補（2個）</span>
+      <span style="color:var(--ink-dim);">※ 直近15回で未出現の数字は予想から除外しています</span>
+    `;
+  } else {
+    legend.innerHTML = `
+      <span><span class="dot axis"></span> 軸数字（直近15回で3回以上出現）</span>
+      <span><span class="dot cold"></span> コールドナンバー（直近20回未出現）</span>
+      <span><span class="dot bonus"></span> ボーナス候補（2個）</span>
+    `;
+  }
+  legend.style.display = "";
+}
+
+function blockIndex(n) {
+  const keys = Object.keys(BLOCK_RANGES);
+  return keys.indexOf(blockOf(n));
+}
+
+/* ============================================================
+   CSV出力
+============================================================ */
+function getNextRound() {
+  let maxRound = null;
+  currentData.forEach(d => {
+    if (typeof d.round === "number" && !isNaN(d.round)) {
+      if (maxRound === null || d.round > maxRound) maxRound = d.round;
+    }
+  });
+  return maxRound !== null ? maxRound + 1 : null;
+}
+
+function downloadCSV(patterns) {
+  const nextRound = getNextRound();
+  let csv = "";
+  if (nextRound !== null) {
+    csv += `第${nextRound}回 予想\n`;
+  }
+  csv += "No,パターン名,意図,数字1,数字2,数字3,数字4,数字5,数字6,数字7,ボーナス候補1,ボーナス候補2\n";
+  patterns.forEach((p, idx) => {
+    const intent = `"${p.intent.replace(/"/g, '""')}"`;
+    const name = `"${p.name.replace(/"/g, '""')}"`;
+    csv += `${idx + 1},${name},${intent},${p.numbers.join(",")},${p.bonus[0]},${p.bonus[1]}\n`;
+  });
+  const blob = new Blob(["﻿" + csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const now = new Date();
+  const ts = now.getFullYear()
+    + String(now.getMonth() + 1).padStart(2, "0")
+    + String(now.getDate()).padStart(2, "0") + "_"
+    + String(now.getHours()).padStart(2, "0")
+    + String(now.getMinutes()).padStart(2, "0")
+    + String(now.getSeconds()).padStart(2, "0");
+  a.href = url;
+  a.download = nextRound !== null
+    ? `loto7_第${nextRound}回_${ts}.csv`
+    : `loto7_${ts}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* ============================================================
+   実行制御
+============================================================ */
+function readCount() {
+  const input = document.getElementById("count");
+  let v = parseInt(input.value, 10);
+  if (isNaN(v)) v = 5;
+  v = Math.max(1, Math.min(20, v));
+  input.value = v;
+  document.getElementById("countEcho").textContent = v;
+  return v;
+}
+
+function updateRoundTitle() {
+  const titleEl = document.getElementById("roundTitle");
+  const subEl = document.getElementById("roundSub");
+
+  let maxRound = null;
+  let minRound = null;
+  currentData.forEach(d => {
+    if (typeof d.round === "number" && !isNaN(d.round)) {
+      if (maxRound === null || d.round > maxRound) maxRound = d.round;
+      if (minRound === null || d.round < minRound) minRound = d.round;
+    }
+  });
+
+  if (maxRound !== null) {
+    const nextRound = maxRound + 1;
+    titleEl.textContent = `第${nextRound}回 予想`;
+    titleEl.style.display = "";
+    if (minRound !== null && minRound !== maxRound) {
+      subEl.textContent =
+        `直近${currentData.length}回（第${minRound}〜${maxRound}回）の出現傾向を分析しています`;
+    } else {
+      subEl.textContent =
+        `直近${currentData.length}回（〜第${maxRound}回）の出現傾向を分析しています`;
+    }
+  } else {
+    titleEl.textContent = "次回 予想";
+    titleEl.style.display = "";
+    subEl.textContent = `直近${currentData.length}回の出現傾向を分析しています`;
+  }
+}
+
+function runGenerate() {
+  const count = readCount();
+  const excludeOn = document.getElementById("excludeToggle").checked;
+  try {
+    updateRoundTitle();
+    lastAnalysis = analyze(currentData, excludeOn);
+    lastPatterns = generatePatterns(lastAnalysis, count);
+    renderSummary(lastAnalysis);
+    renderResults(lastPatterns, lastAnalysis);
+  } catch (e) {
+    document.getElementById("results").innerHTML =
+      `<div class="empty" style="color:var(--red);">エラー: ${e.message}</div>`;
+  }
+}
+
+/* ============================================================
+   イベント登録
+============================================================ */
+document.getElementById("generateBtn").addEventListener("click", runGenerate);
+document.getElementById("rerollBtn").addEventListener("click", runGenerate);
+
+document.getElementById("excludeToggle").addEventListener("change", runGenerate);
+
+document.getElementById("count").addEventListener("input", () => {
+  const v = parseInt(document.getElementById("count").value, 10);
+  document.getElementById("countEcho").textContent = isNaN(v) ? "—" : Math.max(1, Math.min(20, v));
+});
+
+document.getElementById("csvBtn").addEventListener("click", () => {
+  if (lastPatterns.length === 0) {
+    alert("先に「予想する」ボタンで予想を生成してください。");
+    return;
+  }
+  downloadCSV(lastPatterns);
+});
+
+document.getElementById("applyDataBtn").addEventListener("click", () => {
+  const status = document.getElementById("dataStatus");
+  try {
+    const data = textToData(document.getElementById("dataArea").value);
+    currentData = data;
+    status.className = "data-status ok";
+    status.textContent = `✓ ${data.length}回分のデータを反映しました。「予想する」を押してください。`;
+  } catch (e) {
+    status.className = "data-status err";
+    status.textContent = `✗ ${e.message}`;
+  }
+});
+
+document.getElementById("resetDataBtn").addEventListener("click", () => {
+  currentData = buildSampleData();
+  document.getElementById("dataArea").value = dataToText(currentData);
+  const status = document.getElementById("dataStatus");
+  status.className = "data-status ok";
+  status.textContent = "✓ 埋め込みデータ（第652〜676回）に戻しました。";
+});
+
+/* 初期化 */
+document.getElementById("dataArea").value = dataToText(currentData);
+runGenerate();
+</script>
+</body>
+</html>
